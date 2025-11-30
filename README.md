@@ -101,7 +101,7 @@ Retrieval parameters in search_with_reranking():
 - candidate_multiplier: Pool size (default: 4)
 
 LLM temperature in generate_final_answer():
-- Default: 0
+- Default: 0.2
 
 ## How It Works
 
