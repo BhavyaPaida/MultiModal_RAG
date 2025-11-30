@@ -1,0 +1,79 @@
+# -------------------------
+# Python
+# -------------------------
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pkl
+*.log
+
+# Virtual Environments
+venv/
+.env/
+myenv/
+.env
+*.env
+
+# Byte-compiled / optimized / DLL files
+*.so
+*.dll
+*.dylib
+
+# -------------------------
+# PDFs & Extracted Content
+# -------------------------
+*.pdf
+unstructured/
+extracted_images/
+temp/
+tmp/
+
+# -------------------------
+# Vector Databases (Chroma)
+# -------------------------
+chroma/
+chroma_db/
+db/
+dbv1/
+*.sqlite3
+*.db
+*.index
+
+# -------------------------
+# Cache & Model Downloads
+# -------------------------
+.cache/
+transformers/
+sentence_transformers/
+huggingface/
+.huggingface/
+datasets/
+models/
+
+# -------------------------
+# Streamlit
+# -------------------------
+.streamlit/
+
+# -------------------------
+# System / IDE Files
+# -------------------------
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# -------------------------
+# Pip / Build
+# -------------------------
+dist/
+build/
+*.egg-info/
+
+# -------------------------
+# Other unwanted files
+# -------------------------
+*.tmp
+*.bak
+*.swp

@@ -1,0 +1,17 @@
+streamlit
+langchain
+python-dotenv
+sentence-transformers
+langchain-google-genai
+langchain-chroma
+pillow
+unstructured[all-docs]
+chromadb
+pdf2image
+pypdf
+pymupdf
+transformers
+
+tiktoken
+numpy
+requests
