@@ -44,7 +44,7 @@ def safe_coordinates(coords_obj):
         return None
 
     try:
-        # coords_obj.points is a list of coordinate tuples
+        
         pts = coords_obj.points
         pts_list = [[float(x), float(y)] for (x, y) in pts]
 
@@ -152,7 +152,6 @@ Produce a detailed searchable description that includes:
 Return ONLY the description.
 """
 
-        # MULTIMODAL MESSAGE
         message_content = [{"type": "text", "text": prompt}]
 
         for img_b64 in images:
@@ -183,7 +182,7 @@ def summarize_chunks(chunks):
 
         content = seperate_content_types(chunk)
 
-        # ---- Generate multimodal summary ----
+        
         summary = None
         if content["tables"] or content["images"]:
             try:
@@ -197,11 +196,11 @@ def summarize_chunks(chunks):
                 print("Summary failed:", e)
                 summary = None
 
-        # fallback
+        
         if not summary:
             summary = content["text"]
 
-        # ---- JSON encode complex metadata for Chroma ----
+        
         metadata = {
             "raw_text": content["text"],
 
@@ -210,7 +209,7 @@ def summarize_chunks(chunks):
             "elements": json.dumps(content["elements"]),
             "types": json.dumps(content["types"]),
 
-            # NEW
+           
             "chunk_page": content.get("chunk_page", None),
         }
 
@@ -243,11 +242,6 @@ def create_vector_store(documents, persist_directory="dbv1/chroma_db"):
 
 
 
-# ---------------------------------------
-# Load cross encoder once
-# ---------------------------------------
-
-
 
 def search_with_reranking(db,query, k=3, candidate_multiplier=4):
     """
@@ -256,31 +250,26 @@ def search_with_reranking(db,query, k=3, candidate_multiplier=4):
     2. Rerank with cross-encoder
     """
 
-    # ---------------------- Stage 1: Vector Retrieval ----------------------
+    
     candidate_k = min(k * candidate_multiplier, 20)
     
     retriever = db.as_retriever(search_kwargs={"k": candidate_k})
-    results = retriever.invoke(query)     # list of documents/chunks
+    results = retriever.invoke(query)     
 
-    # If retriever returns Document objects, get page_content
+    
     candidate_texts = [r.page_content for r in results]
 
-    # ---------------------- Stage 2: Cross-Encoder Reranking ----------------
-    # Create query-document pairs
     pairs = [[query, doc] for doc in candidate_texts]
 
-    # Predict similarity for each pair
+   
     scores = reranker.predict(pairs)
 
-    # ---------------------- Sort & return Top-k ----------------------------
-    # Combine results + scores
     reranked = sorted(
         list(zip(results, scores)),
         key=lambda x: x[1],
         reverse=True
     )[:k]
 
-    # final list of only documents
     final_docs = [doc for (doc, score) in reranked]
 
     return final_docs
@@ -307,12 +296,7 @@ def produce_raw_chunks(top_chunks):
         })
         return raw_chunks
 
-    #print("\n================ RAW CHUNK ================\n")
-    #print("PAGE:", page)
-    #print("RAW TEXT:\n", raw_text[:600])   # print only raw PDF text
-    #print("\nRAW TABLE COUNT:", len(raw_tables))
-    #print("RAW IMAGE COUNT:", len(raw_images))
-    #print("===========================================\n")
+    
 
 
 def generate_final_answer(chunks, query):
@@ -334,7 +318,7 @@ def generate_final_answer(chunks, query):
             temperature=0.2
         )
 
-        # ---------------- HEADER PROMPT ----------------
+        
         prompt_text = f"""
 You are answering a user question based ONLY on the RAW PDF content.
 
@@ -352,7 +336,7 @@ RAW CONTENT STARTS BELOW:
 
         message_content = [{"type": "text", "text": prompt_text}]
 
-        # ---------------- RAW CONTENT LOOP ----------------
+        
         for i, chunk in enumerate(chunks):
 
             raw_text = chunk.get("raw_text", "")
@@ -365,21 +349,21 @@ RAW CONTENT STARTS BELOW:
                 "text": f"\n\n====== RAW DOCUMENT {i+1} (Page {page}) ======\n"
             })
 
-            # RAW TEXT
+            
             if raw_text.strip():
                 message_content.append({
                     "type": "text",
                     "text": f"\nRAW TEXT:\n{raw_text}\n"
                 })
 
-            # RAW TABLES
+            
             for t_idx, table_html in enumerate(raw_tables):
                 message_content.append({
                     "type": "text",
                     "text": f"\nTABLE {t_idx} (Page {page}):\n{table_html}\n"
                 })
 
-            # RAW IMAGES
+           
             for img_idx, b64 in enumerate(raw_images):
 
                 message_content.append({
@@ -392,7 +376,7 @@ RAW CONTENT STARTS BELOW:
                     "image_url": f"data:image/jpeg;base64,{b64}"
                 })
 
-        # ---------------- END + LLM CALL ----------------
+        
         message_content.append({
             "type": "text",
             "text": "\nEND OF RAW CONTENT.\n\nFINAL ANSWER:\n"
